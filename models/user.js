@@ -14,6 +14,17 @@ const UserSchema = new Schema({
   friends: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
+UserSchema.methods.setPassword = (password) => {
+  this.salt = crypto.randomBytes(16).toString('hex');
+  this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
+};
+
+UserSchema.methods.validPassword = (password) => {
+  const hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
+
+  return this.hash === hash;
+};
+
 const UserModel = mongoose.model('User', UserSchema);
 
 module.exports = UserModel;
