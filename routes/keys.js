@@ -58,7 +58,7 @@ router.get('/public', (req, res) => {
   
   const buffer = Buffer.from(privateKey, 'hex');
   
-  if (compressed === false || compressed === '0') {
+  if (compressed === false) {
     const keyPair = ECPair.fromPrivateKey(buffer, { compressed: false });
     return res.send(
       keyPair.publicKey.toString('hex')
