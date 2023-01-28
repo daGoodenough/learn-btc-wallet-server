@@ -3,16 +3,29 @@ const router = require('express').Router();
 const bitcoin = require('bitcoinjs-lib');
 const { ECPairFactory } = require('ecpair');
 const ecc = require('tiny-secp256k1');
+const wif = require('wif');
 
 const ECPair = ECPairFactory(ecc)
 
 router.get('/private', (req, res) => {
+  const privateKey =
+    ECPair.makeRandom()
+      .privateKey
+      .toString('hex');
+
+  const privKeyBuffer = Buffer.from(privateKey, 'hex');
+
+  const version = 128;
+
+  const wifCompressed = wif.encode(version, privKeyBuffer, true);
+  const wifUncompressed = wif.encode(version, privKeyBuffer, false);
+
   return (
-    res.send(
-      ECPair.makeRandom()
-        .privateKey
-        .toString('hex')
-    )
+    res.json({
+      privateKey,
+      wifCompressed,
+      wifUncompressed,
+    })
   );
 });
 
@@ -21,16 +34,24 @@ router.get('/public', (req, res) => {
   //params will indicate compressed or nah
   //default to compressed
   const { privateKey } = req.body;
-  const keyPair = ECPair.fromPrivateKey(privateKey);
+
+  if (!privateKey) {
+    return res.status(400).send("Private key required");
+  }
+
+  const buffer = Buffer.from(privateKey, 'hex');
 
   const { compressed } = req.query;
-
-  if (compressed === 0) {
+  if (compressed === "0") {
+    const keyPair = ECPair.fromPrivateKey(buffer, { compressed: false });
     return res.send(
-      keyPair.publicKey
-    )
-  }
+      keyPair.publicKey.toString('hex')
+    );
+  };
+
+  const keyPair = ECPair.fromPrivateKey(buffer);
   const pubKeyCompressed = keyPair.publicKey.toString('hex')
+
   return res.send(
     pubKeyCompressed
   )
