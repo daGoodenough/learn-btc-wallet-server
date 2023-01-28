@@ -34,12 +34,20 @@ router.get('/public', (req, res) => {
   //params will indicate compressed or nah
   //default to compressed
   let { privateKey, wifEncoded } = req.body;
+  let { compressed } = req.query;
 
   if (!privateKey && !wifEncoded) {
-    return res.status(400).send("Private key required");
+    //no keys were provided to generate from
+    const keyPair = compressed ? 
+      ECPair.makeRandom({compressed: true}) : 
+      ECPair.makeRandom({compressed: false});
+
+    return res.json({
+      publicKey: keyPair.publicKey.toString('hex'),
+      privateKey: keyPair.privateKey.toString('hex'),
+    })
   }
 
-  let { compressed } = req.query;
 
   if(wifEncoded) {
     const wifDecoded = wif.decode(wifEncoded);
