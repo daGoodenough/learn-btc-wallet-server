@@ -30,8 +30,8 @@ module.exports.signup = (req, res, next) => {
     user.username = username;
     user.email = email;
 
-    user.setPassword(password);
-    
+    user.setPassword(password,user);
+
     user.save((err, user) => {
       if (err) {
         return next(err);
