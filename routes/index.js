@@ -7,4 +7,7 @@ const authRoutes = require('./auth');
 const keyRoutes = require('./keys');
  router.use('/api/keys', keyRoutes);
 
+const addressRoutes = require('./addresses');
+  router.use('/api/address', addressRoutes);
+
 module.exports = router;
