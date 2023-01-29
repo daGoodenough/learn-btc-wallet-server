@@ -1,7 +1,7 @@
 const jwt = require('jwt-simple');
 const User = require('../models/user');
 
-const tokenSecret = process.env.NODE_ENV === 'production' ? process.env.PROD_TOKEN_SECRET : process.env.DEV_TOKEN_SECRET;
+const tokenSecret = process.env.NODE_ENV === 'production' ? process.env.PROD_TOKEN_SECRET : 'helloworld';
 
 function tokenForUser(user) {
   return jwt.encode({
@@ -9,6 +9,15 @@ function tokenForUser(user) {
     iat: Math.round(Date.now() / 1000),
     exp: Math.round(Date.now() / 1000 + 5 * 60 * 60)
   }, tokenSecret);
+}
+
+module.exports.signin = (req, res, next) => {
+  const user = {
+    email: req.user.email,
+    token: tokenForUser(req.user),
+  }
+
+  res.send(user);
 }
 
 module.exports.signup = (req, res, next) => {
