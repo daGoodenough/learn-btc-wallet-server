@@ -19,7 +19,7 @@ UserSchema.methods.setPassword = (password, user) => {
   user.hash = crypto.pbkdf2Sync(password, user.salt, 1000, 64, 'sha512').toString('hex');
 };
 
-UserSchema.methods.validPassword = (password) => {
+UserSchema.methods.validPassword = (password, user) => {
   const hash = crypto.pbkdf2Sync(password, user.salt, 1000, 64, 'sha512').toString('hex');
 
   return user.hash === hash;
