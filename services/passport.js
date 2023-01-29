@@ -32,11 +32,14 @@ const jwtOptions = {
 
 const jwtLogin = new JwtStrategy(jwtOptions, async(payload, done) => {
   // const user = find user by id from jwt (id: payload.sub)
-  if(user) {
-    done(null, user);
-  } else {
-    done(null, false);
-  }
+  User.findById(payload.sub, (err, user) => {
+    if (err) { return done(err, false) };
+    if(user) {
+      done(null, user);
+    } else {
+      done(null, false);
+    };
+  });
 });
 
 passport.use(localLogin);
