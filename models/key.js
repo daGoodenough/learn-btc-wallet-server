@@ -12,4 +12,4 @@ const KeySchema = new Schema({
 
 const KeyModel = mongoose.model('Key', KeySchema);
 
-module.exports = KeyModel;
+module.exports = {KeyModel, KeySchema};

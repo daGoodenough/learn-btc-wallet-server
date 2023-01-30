@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-mongoose.set('stringQuery', false);
+mongoose.set('strictQuery', false);
 const { Schema, model } = mongoose;
 const UserModel = require('./user');
 
@@ -12,4 +12,4 @@ const TransactionSchema = new Schema({
 
 const TransactionModel = model('Transaction', TransactionSchema);
 
-module.exports = TransactionModel;
+module.exports = {TransactionModel, TransactionSchema};

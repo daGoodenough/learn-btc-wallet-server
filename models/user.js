@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 const crypto = require('crypto');
 const { Schema } = mongoose;
-const WalletSchema = './wallet';
-const KeySchema = './key';
+const { WalletSchema } = require('./wallet');
+const { KeySchema } = require('./key');
 
 const UserSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
-  username: {type: String, unique: true},
+  username: { type: String, unique: true },
   hash: String,
   salt: String,
   keys: [KeySchema],
