@@ -10,4 +10,7 @@ const keyRoutes = require('./keys');
 const addressRoutes = require('./addresses');
   router.use('/api/address', addressRoutes);
 
+const walletRoutes = require('./wallets');
+  router.use('/api/wallets', walletRoutes);
+
 module.exports = router;
