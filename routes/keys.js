@@ -4,6 +4,9 @@ const bitcoin = require('bitcoinjs-lib');
 const { ECPairFactory } = require('ecpair');
 const ecc = require('tiny-secp256k1');
 const wif = require('wif');
+const {requireAuth} = require('../services/passport')
+const User = require('../models/user');
+const Key = require('../models/key');
 
 const ECPair = ECPairFactory(ecc)
 
@@ -71,6 +74,33 @@ router.get('/public', (req, res) => {
   return res.send(
     pubKeyCompressed
   )
+})
+
+router.post('/', requireAuth, (req, res) => {
+  const {privateKey, publicKey, keyName, compressed, network} = req.body;
+
+  if(!(privateKey || publicKey || keyName)){
+    return res.status(400).send("Private and public keys and key pair name are all required");
+  };
+
+ const key = new Key({
+  privateKey,
+  publicKey,
+  network: network || null,
+  compressed: compressed || null,
+  keyName
+ })
+
+ req.user.keys.push(key);
+  // User.findById(req.user.id, (err, user) => {
+  //   if(err) {res.send(err)};
+
+
+  // })
+  req.user.save((err, user) => {
+    if(err) {return res.send(err)}
+    return res.send(user);
+  });
 })
 
 module.exports = router;
