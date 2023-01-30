@@ -6,7 +6,7 @@ const ecc = require('tiny-secp256k1');
 const wif = require('wif');
 const {requireAuth} = require('../services/passport')
 const User = require('../models/user');
-const Key = require('../models/key');
+const Key = require('../models/key').KeyModel;
 
 const ECPair = ECPairFactory(ecc)
 
