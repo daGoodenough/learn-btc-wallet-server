@@ -11,7 +11,7 @@ const UserSchema = new Schema({
   hash: String,
   salt: String,
   keys: [KeySchema],
-  wallets: [WalletSchema],
+  wallets: [{type: Schema.Types.ObjectId, ref: 'Wallet'}],
   friends: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 

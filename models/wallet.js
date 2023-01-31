@@ -6,7 +6,7 @@ const {KeySchema} = require('./key');
 
 const WalletSchema = new Schema({
   address: String,
-  keys: [KeySchema],
+  keys: [{type: Schema.Types.ObjectId, ref: 'Key'}],
   type: String,
   balance: Number,
   transactions: [{type: Schema.Types.ObjectId, ref: 'Transaction'}]
