@@ -21,13 +21,16 @@ router.post('/', requireAuth, (req, res) => {
         type,
       });
 
-      keys.forEach(key => wallet.keys.push(key));
+      Array.isArray(keys) ? keys.forEach(key => wallet.keys.push(key)) : wallet.keys.push(keys)
 
       req.user.wallets.push(wallet);
 
       req.user.save((err, user) => {
         if (err) { return res.send(err) };
-        return res.send(user);
+      });
+      wallet.save((err, wallet) => {
+        if (err) { return res.send(err) };
+        return res.send(wallet);
       });
     };
   } catch (error) {

@@ -99,8 +99,11 @@ router.post('/', requireAuth, (req, res) => {
   // })
   req.user.save((err, user) => {
     if(err) {return res.send(err)}
-    return res.send(user);
   });
+  key.save(err => {
+    if(err){return res.send(err)}
+    return res.send(key);
+  })
 })
 
 module.exports = router;
