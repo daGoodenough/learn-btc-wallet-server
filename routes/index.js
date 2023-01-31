@@ -13,4 +13,7 @@ const addressRoutes = require('./addresses');
 const walletRoutes = require('./wallets');
   router.use('/api/wallets', walletRoutes);
 
+const transactionRoutes = require('./transactions');
+  router.use('/api/transactions', transactionRoutes);
+
 module.exports = router;
