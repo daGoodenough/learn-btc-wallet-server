@@ -5,7 +5,7 @@ const Authentication = require('../controllers/authentication');
 
 const requireSignin = passport.authenticate('local', {session: false});
 
-router.post('/signin', requireSignin, Authentication.signin);
+router.post('/login', requireSignin, Authentication.signin);
 router.post('/signup', Authentication.signup)
 
 module.exports = router;
