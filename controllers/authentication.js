@@ -40,14 +40,14 @@ module.exports.signup = (req, res, next) => {
     user.username = username;
     user.email = email;
 
-    user.setPassword(password,user);
+    user.setPassword(password, user);
 
     user.save((err, user) => {
       if (err) {
         return next(err);
       }
 
-      res.json({ 
+      res.json({
         token: tokenForUser(user),
         email,
         username,
@@ -55,4 +55,14 @@ module.exports.signup = (req, res, next) => {
     })
 
   })
+}
+
+module.exports.currentUser = (req, res) => {
+  const { email, username } = req.user;
+
+  res.json({
+    email,
+    username,
+    token: tokenForUser(req.user)
+  });
 }
