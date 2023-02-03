@@ -7,8 +7,6 @@ const Wallet = require('../models/wallet').WalletModel;
 router.post('/', requireAuth, (req, res) => {
   const { address, keys, type } = req.body;
 
-  console.log(req.body)
-
   if (!(address || keys || type)) {
     return res.status(400).send("Address, wallet type, and keys used to create address required");
   };
@@ -37,6 +35,10 @@ router.post('/', requireAuth, (req, res) => {
     console.log(error);
     res.status(400).send(error.message);
   };
+});
+
+router.get('/', requireAuth, async (req, res) => {
+  return res.json(req.user.wallets);
 });
 
 module.exports = router;
