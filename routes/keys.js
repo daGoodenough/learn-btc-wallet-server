@@ -4,7 +4,7 @@ const bitcoin = require('bitcoinjs-lib');
 const { ECPairFactory } = require('ecpair');
 const ecc = require('tiny-secp256k1');
 const wif = require('wif');
-const {requireAuth} = require('../services/passport')
+const { requireAuth } = require('../services/passport')
 const User = require('../models/user');
 const Key = require('../models/key').KeyModel;
 
@@ -41,9 +41,9 @@ router.get('/public', (req, res) => {
 
   if (!privateKey && !wifEncoded) {
     //no keys were provided to generate from
-    const keyPair = compressed ? 
-      ECPair.makeRandom({compressed: true}) : 
-      ECPair.makeRandom({compressed: false});
+    const keyPair = compressed ?
+      ECPair.makeRandom({ compressed: true }) :
+      ECPair.makeRandom({ compressed: false });
 
     return res.json({
       publicKey: keyPair.publicKey.toString('hex'),
@@ -52,15 +52,15 @@ router.get('/public', (req, res) => {
   }
 
 
-  if(wifEncoded) {
+  if (wifEncoded) {
     const wifDecoded = wif.decode(wifEncoded);
 
     privateKey = wifDecoded.privateKey.toString('hex');
     compressed = wifDecoded.compressed;
   }
-  
+
   const buffer = Buffer.from(privateKey, 'hex');
-  
+
   if (compressed === false) {
     const keyPair = ECPair.fromPrivateKey(buffer, { compressed: false });
     return res.send(
@@ -77,33 +77,33 @@ router.get('/public', (req, res) => {
 })
 
 router.post('/', requireAuth, (req, res) => {
-  const {privateKey, publicKey, keyName, compressed, network} = req.body;
+  const { privateKey, publicKey, keyName, compressed, network } = req.body;
 
-  if(!(privateKey || publicKey || keyName)){
+  if (!(privateKey || publicKey || keyName)) {
     return res.status(400).send("Private and public keys and key pair name are all required");
   };
 
- const key = new Key({
-  privateKey,
-  publicKey,
-  network: network || null,
-  compressed: compressed || null,
-  keyName
- })
+  const key = new Key({
+    privateKey,
+    publicKey,
+    network: network || null,
+    compressed: compressed || null,
+    keyName
+  })
 
- req.user.keys.push(key);
-  // User.findById(req.user.id, (err, user) => {
-  //   if(err) {res.send(err)};
-
-
-  // })
+  req.user.keys.push(key);
+ 
   req.user.save((err, user) => {
-    if(err) {return res.send(err)}
+    if (err) { return res.send(err) }
   });
   key.save(err => {
-    if(err){return res.send(err)}
+    if (err) { return res.send(err) }
     return res.send(key);
   })
+});
+
+router.get('/', requireAuth, (req, res) => {
+  res.json({ keys: req.user.keys })
 })
 
 module.exports = router;
