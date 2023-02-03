@@ -8,9 +8,7 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const localOptions = {usernameField: 'email'}
 
 const localLogin = new LocalStrategy(localOptions, (email, password, done) => {
-  console.log(email);
   User.findOne({email: email}, (err, user) => {
-    console.log(user);
     if(err) {return done(err)};
     if(!user) {
       return done(null, false);
@@ -18,7 +16,6 @@ const localLogin = new LocalStrategy(localOptions, (email, password, done) => {
     if(!user.validPassword(password, user)) {
         return done(null, false, {message: "Incorrect Password"});
     };
-    console.log("User", user);
     return done(null, user);
   })
 });
@@ -32,14 +29,19 @@ const jwtOptions = {
 
 const jwtLogin = new JwtStrategy(jwtOptions, async(payload, done) => {
   // const user = find user by id from jwt (id: payload.sub)
-  User.findById(payload.sub, (err, user) => {
-    if (err) { return done(err, false) };
-    if(user) {
-      done(null, user);
-    } else {
-      done(null, false);
-    };
-  });
+  User
+    .findById(payload.sub)
+    .populate('wallets')
+    .exec(
+      (err, user) => {
+        if (err) { return done(err, false) };
+        if(user) {
+          done(null, user);
+        } else {
+          done(null, false);
+        };
+      }
+    )
 });
 
 passport.use(localLogin);
