@@ -32,7 +32,7 @@ router.get('/private', (req, res) => {
   );
 });
 
-router.get('/public', (req, res) => {
+router.post('/public', (req, res) => {
   //body will get private key
   //params will indicate compressed or nah
   //default to compressed
