@@ -37,13 +37,14 @@ router.post('/public', (req, res) => {
   //params will indicate compressed or nah
   //default to compressed
   let { privateKey, wifEncoded } = req.body;
-  let { compressed } = req.query;
+  let { compressed, network } = req.query;
+  const btcNetwork = bitcoin.networks[network] || bitcoin.networks['regtest']
 
   if (!privateKey && !wifEncoded) {
     //no keys were provided to generate from
     const keyPair = compressed ?
-      ECPair.makeRandom({ compressed: true }) :
-      ECPair.makeRandom({ compressed: false });
+      ECPair.makeRandom({ compressed: true, network }) :
+      ECPair.makeRandom({ compressed: false, network });
 
     return res.json({
       publicKey: keyPair.publicKey.toString('hex'),
@@ -61,8 +62,8 @@ router.post('/public', (req, res) => {
 
   const buffer = Buffer.from(privateKey, 'hex');
 
-  const keyUncompressed = ECPair.fromPrivateKey(buffer, { compressed: false })
-  const keyCompressed = ECPair.fromPrivateKey(buffer, { compressed: true });
+  const keyUncompressed = ECPair.fromPrivateKey(buffer, { compressed: false, network })
+  const keyCompressed = ECPair.fromPrivateKey(buffer, { compressed: true, network });
 
   return res.json({
     compressed: keyCompressed.publicKey.toString('hex'),
