@@ -1,11 +1,13 @@
 const bitcoin = require('bitcoinjs-lib');
 const { ECPairFactory } = require('ecpair');
 const ecc = require('tiny-secp256k1');
+const {KeyModel} = require('../models/key');
 
 const ECPair = ECPairFactory(ecc);
 
-module.exports.generateP2pkh = (req, res, next) => {
-  const { publicKey, network } = req.body;
+module.exports.generateP2pkh = async (req, res, next) => {
+  const { keys, network } = req.body;
+  const {publicKey} = await KeyModel.findById(keys)
 
   const addressObj =
     bitcoin.payments.p2pkh({
