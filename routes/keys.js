@@ -61,19 +61,13 @@ router.post('/public', (req, res) => {
 
   const buffer = Buffer.from(privateKey, 'hex');
 
-  if (compressed === false) {
-    const keyPair = ECPair.fromPrivateKey(buffer, { compressed: false });
-    return res.send(
-      keyPair.publicKey.toString('hex')
-    );
-  };
+  const keyUncompressed = ECPair.fromPrivateKey(buffer, { compressed: false })
+  const keyCompressed = ECPair.fromPrivateKey(buffer, { compressed: true });
 
-  const keyPair = ECPair.fromPrivateKey(buffer);
-  const pubKeyCompressed = keyPair.publicKey.toString('hex')
-
-  return res.send(
-    pubKeyCompressed
-  )
+  return res.json({
+    compressed: keyCompressed.publicKey.toString('hex'),
+    uncompressed: keyUncompressed.publicKey.toString('hex'),
+  })
 })
 
 router.post('/', requireAuth, (req, res) => {
@@ -92,7 +86,7 @@ router.post('/', requireAuth, (req, res) => {
   })
 
   req.user.keys.push(key);
- 
+
   req.user.save((err, user) => {
     if (err) { return res.send(err) }
   });
