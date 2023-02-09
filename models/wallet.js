@@ -5,6 +5,7 @@ const { Schema, model } = mongoose;
 const {KeySchema} = require('./key');
 
 const WalletSchema = new Schema({
+  walletName: String,
   address: String,
   keys: [{type: Schema.Types.ObjectId, ref: 'Key'}],
   type: String,

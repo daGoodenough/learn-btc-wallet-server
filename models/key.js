@@ -6,6 +6,7 @@ const KeySchema = new Schema({
   privateKey: String,
   publicKey: String,
   isCompressed: Boolean,
+  wif: String,
   network: String,
   keyName: String,
 });
