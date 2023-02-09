@@ -40,13 +40,15 @@ router.post('/', requireAuth, (req, res) => {
 
 router.post('/p2pkh', requireAuth, generateP2pkh, (req, res) => {
   const address = req.p2pkh;
-  const {keys} = req.body;
+  const {keys, name} = req.body;
   try {
     const result = bitcoin.address.fromBase58Check(address);
     if (result) {
       const wallet = new Wallet({
         address,
         type: 'p2pkh',
+        walletName: name,
+        balance: 0,
       });
 
       Array.isArray(keys) ? keys.forEach(key => wallet.keys.push(key)) : wallet.keys.push(keys)

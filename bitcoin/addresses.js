@@ -7,7 +7,7 @@ const ECPair = ECPairFactory(ecc);
 
 module.exports.generateP2pkh = async (req, res, next) => {
   const { keys, network } = req.body;
-  const {publicKey} = await KeyModel.findById(keys)
+  const { publicKey } = await KeyModel.findById(keys)
 
   const addressObj =
     bitcoin.payments.p2pkh({
