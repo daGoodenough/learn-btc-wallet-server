@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 mongoose.set('strictQuery', false); 
 const cors = require('cors');
 
-mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.kph3znu.mongodb.net/?retryWrites=true&w=majority`, {
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.kph3znu.mongodb.net/?retryWrites=true&w=majority`, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
