@@ -8,7 +8,7 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 
 router.use((req, res, next) => {
   if (!req.body.network) {
-    req.body.network = 'testnet';
+    req.body.network = 'regtest';
   }
   next();
 })
