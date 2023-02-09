@@ -83,7 +83,7 @@ router.post('/', requireAuth, (req, res) => {
     publicKey,
     wif,
     network: network || null,
-    compressed: compressed || null,
+    isCompressed: compressed || null,
     keyName
   })
 
