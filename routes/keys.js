@@ -72,7 +72,7 @@ router.post('/public', (req, res) => {
 })
 
 router.post('/', requireAuth, (req, res) => {
-  const { privateKey, publicKey, keyName, compressed, network } = req.body;
+  const { privateKey, publicKey, keyName, compressed, wif, network } = req.body;
 
   if (!(privateKey || publicKey || keyName)) {
     return res.status(400).send("Private and public keys and key pair name are all required");
@@ -81,6 +81,7 @@ router.post('/', requireAuth, (req, res) => {
   const key = new Key({
     privateKey,
     publicKey,
+    wif,
     network: network || null,
     compressed: compressed || null,
     keyName
