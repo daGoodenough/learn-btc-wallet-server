@@ -1,5 +1,11 @@
 const router = require('express').Router();
 
+router.use((req, res, next) => {
+  if (!req.body.network) {
+    req.body.network = 'regtest';
+  }
+  next();
+})
 
 const authRoutes = require('./auth');
  router.use('/auth', authRoutes);
