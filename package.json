@@ -27,7 +27,8 @@
     "query-types": "^0.1.4",
     "regtest-client": "^0.2.0",
     "tiny-secp256k1": "^2.2.1",
-    "wif": "^2.0.6"
+    "wif": "^2.0.6",
+    "yajrpc": "^1.4.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
