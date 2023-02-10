@@ -4,6 +4,7 @@ const bitcoin = require('bitcoinjs-lib');
 const User = require('../models/user');
 const { generateP2pkh } = require('../bitcoin/addresses');
 const Wallet = require('../models/wallet').WalletModel;
+const rpc = require('../bitcoin/rpc');
 
 router.post('/', requireAuth, (req, res) => {
   const { address, keys, type } = req.body;
@@ -55,6 +56,10 @@ router.post('/p2pkh', requireAuth, generateP2pkh, (req, res) => {
 
       req.user.wallets.push(wallet);
 
+      rpc('importaddress', [address, wallet._id], (err) => {
+        if(err) {return res.send(err)}
+      });
+
       req.user.save((err, user) => {
         if (err) { return res.send(err) };
       });
@@ -62,6 +67,7 @@ router.post('/p2pkh', requireAuth, generateP2pkh, (req, res) => {
         if (err) { return res.send(err) };
         return res.send(wallet);
       });
+
     };
   } catch (error) {
     console.log(error);
