@@ -1,8 +1,10 @@
 const bitcoin = require('bitcoinjs-lib');
 const { ECPairFactory } = require('ecpair');
 const ecc = require('tiny-secp256k1');
-const { RegtestUtils } = require('regtest-client')
-const regtestUtils = new RegtestUtils(bitcoin)
+
+const { WalletModel } = require('../models/wallet');
+const { TransactionModel } = require('../models/transaction');
+const { faucet, coinbase, getAddrBalance } = require('./rpcUtils');
 
 const ECPair = ECPairFactory(ecc);
 
@@ -57,31 +59,35 @@ module.exports.generateCoinbase = (req, res, next) => {
 };
 
 module.exports.fundWallet = async (req, res, next) => {
-  const address = req.body;
   try {
-    const network = regtestUtils.network // regtest network params
+    const { addressId, amount, fee } = req.body;
+    const address = await WalletModel.findById(addressId);
 
-    const keyPair = ECPair.makeRandom({ network })
-    const p2pkh = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey, network })
+    const txid = await faucet(address.address);
+    
+    //mine one block so that the faucet tx goes through;
+    const blocks = await coinbase(process.env.FAUCET_ADDRESS);
 
+    const newBalance = await getAddrBalance(address.address);
 
-    console.log(p2pkh.address);
+    address.balance = newBalance;
+    
+    const tx = new TransactionModel({
+      txid,
+      recipient: req.user.id,
+      amountSent: amount || 1,
+      fee: fee || 0.00001,
+      coinbase: true,
+    })
 
-    const unspent = await regtestUtils.faucet(p2pkh.address, 2e4)
+    tx.save();
+    
+    address.transactions.push(tx._id);
+    address.save();
 
-    console.log(unspent);
-
-    const fetchedTx = await regtestUtils.fetch(unspent.txId)
-
-    console.log(fetchedTx);
-
-    const results = await regtestUtils.mine(6)
-    console.log(results);
-    // await regtestUtils.faucet(address, 50);
+    res.json(newBalance);
   } catch (error) {
     console.log(error);
+    return res.send(error);
   }
-  // const walletBalance = await regtestUtils.unspents(address);
-  // console.log(walletBalance);
-  res.end();
 }

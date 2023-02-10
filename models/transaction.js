@@ -8,6 +8,8 @@ const TransactionSchema = new Schema({
   recipient: {type: Schema.Types.ObjectId, ref: 'User'},
   amountSent: Number,
   fee: Number,
+  txid: String,
+  coinbase: Boolean,
 })
 
 const TransactionModel = model('Transaction', TransactionSchema);
