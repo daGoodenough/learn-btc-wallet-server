@@ -18,7 +18,7 @@ module.exports.getAddrTxes = async (address, minconf = 0, maxconf = 99999999, in
       'listunspent',
       [minconf, maxconf, [address], includeUnsafe],
       (err, transactions) => {
-        if (err) {reject(err); };
+        if (err) { reject(err); };
         resolve(transactions);
       }
     )
@@ -56,21 +56,31 @@ module.exports.coinbase = async (address, amount = 1) => {
 };
 
 module.exports.getTx = async (txid) => {
-  return new Promise ((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     rpc('gettransaction', [txid, true, true], (err, tx) => {
-      if (err) {reject(err)}
-      
+      if (err) { reject(err) }
+
       resolve(tx);
     })
   })
 };
 
 module.exports.decodeRawTx = async (txHex) => {
-  return new Promise ((resolve, reject) => {
-    rpc('decoderawtransaction', [txHex], (err, decoded) =>{
-      {if(err) reject(err); };
+  return new Promise((resolve, reject) => {
+    rpc('decoderawtransaction', [txHex], (err, decoded) => {
+      { if (err) reject(err); };
 
       resolve(decoded);
     });
-  })
-}
+  });
+};
+
+module.exports.broadcast = async (txHex) => {
+  return new Promise((resolve, reject) => {
+    rpc('sendrawtransaction', [txHex], (err, txid) => {
+      if (err) { reject(err); };
+
+      resolve(txid);
+    });
+  });
+};

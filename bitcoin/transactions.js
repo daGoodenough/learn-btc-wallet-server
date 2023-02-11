@@ -4,8 +4,14 @@ const ecc = require('tiny-secp256k1');
 
 const { WalletModel } = require('../models/wallet');
 const { TransactionModel } = require('../models/transaction');
-const { faucet, coinbase, getAddrBalance, getTx, getAddrTxes, decodeRawTx } = require('./rpcUtils');
-const { decodeRaw } = require('wif');
+const {
+  faucet,
+  coinbase,
+  getAddrBalance,
+  getTx,
+  getAddrTxes,
+  decodeRawTx,
+  broadcast } = require('./rpcUtils');
 
 const ECPair = ECPairFactory(ecc);
 
@@ -103,7 +109,7 @@ module.exports.createRawTx = async (req, res, next) => {
       });
 
       //average size for a p2pkh 
-      const fee = feeRate * 225
+      const fee = feeRate * 226
 
       psbt.addOutput({
         script: bitcoin.address.toOutputScript(address, bitcoin.networks[network]),
@@ -117,7 +123,7 @@ module.exports.createRawTx = async (req, res, next) => {
 
       const decodedTx = await decodeRawTx(hex);
 
-      return res.json({decodedTx, hex});
+      return res.json({ decodedTx, hex });
     }
   } catch (err) {
     console.log(err)
@@ -168,5 +174,17 @@ module.exports.fundWallet = async (req, res, next) => {
   } catch (error) {
     console.log(error);
     return res.send(error);
+  }
+};
+
+module.exports.broadcastRaw = async (req, res, next) => {
+  try {
+    const { txHex } = req.body;
+
+    const txid = await broadcast(txHex);
+    res.send(txid);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
   }
 }
