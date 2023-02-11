@@ -63,4 +63,14 @@ module.exports.getTx = async (txid) => {
       resolve(tx);
     })
   })
+};
+
+module.exports.decodeRawTx = async (txHex) => {
+  return new Promise ((resolve, reject) => {
+    rpc('decoderawtransaction', [txHex], (err, decoded) =>{
+      {if(err) reject(err); };
+
+      resolve(decoded);
+    });
+  })
 }
