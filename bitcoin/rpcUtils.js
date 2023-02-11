@@ -6,12 +6,12 @@ module.exports.getAddrBalance = async (address) => {
       'getreceivedbyaddress',
       [address], (err, data) => {
         if (err) { reject(err); }
-        console.log("Data: ", data);
         resolve(data);
       }
     );
   });
-}
+};
+
 
 module.exports.faucet = async (address, amount = 1, fee = 0.00001) => {
   return new Promise((resolve, reject) => {
@@ -41,4 +41,14 @@ module.exports.coinbase = async (address, amount = 1) => {
       resolve(blocks);
     });
   });
+};
+
+module.exports.getTx = async (txid) => {
+  return new Promise ((resolve, reject) => {
+    rpc('gettransaction', [txid, true, true], (err, tx) => {
+      if (err) {reject(err)}
+      
+      resolve(tx);
+    })
+  })
 }
