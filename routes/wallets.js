@@ -77,17 +77,17 @@ router.post('/p2pkh', requireAuth, generateP2pkh, (req, res) => {
 })
 
 router.get('/', requireAuth, async (req, res) => {
-  req.user.wallets.forEach(async (userWallet) => {
-    const address = await Wallet.findById(userWallet._id);
-    const balance = await getAddrBalance(address.address);
-    console.log(balance);
+  const addresses = await req.user.wallets.map(async (reqAddress) => {
+    const address = await Wallet.findById(reqAddress._id).populate('transactions');
 
+    const balance = await getAddrBalance(address.address);
     address.balance = balance;
+
     address.save();
 
-    userWallet.balance = balance;
+    return address;
   })
-  return res.json(req.user.wallets);
+  Promise.all(addresses).then(addrs => res.json(addrs));
 });
 
 module.exports = router;
