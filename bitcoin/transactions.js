@@ -4,7 +4,7 @@ const ecc = require('tiny-secp256k1');
 
 const { WalletModel } = require('../models/wallet');
 const { TransactionModel } = require('../models/transaction');
-const { faucet, coinbase, getAddrBalance } = require('./rpcUtils');
+const { faucet, coinbase, getAddrBalance, getTx, getAddrTxes } = require('./rpcUtils');
 
 const ECPair = ECPairFactory(ecc);
 
@@ -64,26 +64,38 @@ module.exports.fundWallet = async (req, res, next) => {
     const address = await WalletModel.findById(addressId);
 
     const txid = await faucet(address.address);
-    
+
     //mine one block so that the faucet tx goes through;
-    const blocks = await coinbase(process.env.FAUCET_ADDRESS);
+    coinbase(process.env.FAUCET_ADDRESS);
+
+    const txes = await getAddrTxes(address.address);
+    const userTxes = txes.map(tx => {
+      const userTx = new TransactionModel({
+        txid: tx.txid,
+        recipient: req.user.id,
+        amount: tx.amount,
+        coinbase: true,
+        address: tx.address,
+        scriptPubKey: tx.scriptPubKey,
+        confirmations: tx.confirmations,
+        vout: tx.vout,
+      })
+
+      userTx.save(err => {
+        if (err) { throw (err); };
+      });
+      
+      return userTx;
+    });
+
+    address.transactions = userTxes;
 
     const newBalance = await getAddrBalance(address.address);
-
     address.balance = newBalance;
-    
-    const tx = new TransactionModel({
-      txid,
-      recipient: req.user.id,
-      amountSent: amount || 1,
-      fee: fee || 0.00001,
-      coinbase: true,
-    })
 
-    tx.save();
-    
-    address.transactions.push(tx._id);
-    address.save();
+    address.save((err, address) => {
+      if (err) { console.log(address) }
+    });
 
     res.json(newBalance);
   } catch (error) {
