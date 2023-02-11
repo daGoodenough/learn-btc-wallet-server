@@ -11,6 +11,8 @@ const TransactionSchema = new Schema({
   coinbase: Boolean,
   scriptPubKey: String,
   address: String,
+  confirmations: Number,
+  vout: Number,
 })
 
 const TransactionModel = model('Transaction', TransactionSchema);
