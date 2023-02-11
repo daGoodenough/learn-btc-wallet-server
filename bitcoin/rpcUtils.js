@@ -12,6 +12,18 @@ module.exports.getAddrBalance = async (address) => {
   });
 };
 
+module.exports.getAddrTxes = async (address, minconf = 0, maxconf = 99999999, includeUnsafe = true) => {
+  return new Promise((resolve, reject) => {
+    rpc(
+      'listunspent',
+      [minconf, maxconf, [address], includeUnsafe],
+      (err, transactions) => {
+        if (err) {reject(err); };
+        resolve(transactions);
+      }
+    )
+  })
+}
 
 module.exports.faucet = async (address, amount = 1, fee = 0.00001) => {
   return new Promise((resolve, reject) => {
