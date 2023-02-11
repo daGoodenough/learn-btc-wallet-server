@@ -4,7 +4,8 @@ const ecc = require('tiny-secp256k1');
 
 const { WalletModel } = require('../models/wallet');
 const { TransactionModel } = require('../models/transaction');
-const { faucet, coinbase, getAddrBalance, getTx, getAddrTxes } = require('./rpcUtils');
+const { faucet, coinbase, getAddrBalance, getTx, getAddrTxes, decodeRawTx } = require('./rpcUtils');
+const { decodeRaw } = require('wif');
 
 const ECPair = ECPairFactory(ecc);
 
@@ -58,6 +59,72 @@ module.exports.generateCoinbase = (req, res, next) => {
   }
 };
 
+const validator = (
+  pubkey,
+  msghash,
+  signature,
+) => ECPair.fromPublicKey(pubkey).verify(msghash, signature);
+
+module.exports.createRawTx = async (req, res, next) => {
+  try {
+    const {
+      address,
+      WIFs,
+      utxoId,
+      feeRate = 1,
+      network,
+      vout,
+      scriptPubKey,
+      value,
+      recipientAddr
+    } = req.body;
+
+    if (!(address, WIFs, value, recipientAddr)) {
+      return res.status(400).end();
+    };
+
+    const txIn = await getTx(utxoId);
+
+    if (WIFs.length === 1) {
+      // only one private key
+      const keyPair = ECPair.fromWIF(WIFs[0]);
+
+      const psbt = new bitcoin.Psbt({ network: network });
+
+      psbt.addInput({
+        hash: txIn.txid,
+        index: vout,
+        nonWitnessUtxo: Buffer.from(txIn.hex, 'hex')
+      });
+
+      psbt.addOutput({
+        script: bitcoin.address.toOutputScript(recipientAddr, bitcoin.networks[network]),
+        value: parseInt(value),
+      });
+
+      //average size for a p2pkh 
+      const fee = feeRate * 225
+
+      psbt.addOutput({
+        script: bitcoin.address.toOutputScript(address, bitcoin.networks[network]),
+        value: txIn.decoded.vout[vout].value * 1e8 - value - fee
+      })
+
+      psbt.signAllInputs(keyPair);
+      psbt.finalizeAllInputs();
+
+      const hex = psbt.extractTransaction().toHex();
+
+      const decodedTx = await decodeRawTx(hex);
+
+      return res.json({decodedTx, hex});
+    }
+  } catch (err) {
+    console.log(err)
+    res.send(err.message);
+  }
+}
+
 module.exports.fundWallet = async (req, res, next) => {
   try {
     const { addressId, amount, fee } = req.body;
@@ -84,7 +151,7 @@ module.exports.fundWallet = async (req, res, next) => {
       userTx.save(err => {
         if (err) { throw (err); };
       });
-      
+
       return userTx;
     });
 
