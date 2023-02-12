@@ -12,6 +12,7 @@ const {
   getAddrTxes,
   decodeRawTx,
   broadcast } = require('./rpcUtils');
+const { updateAllAddrs } = require('./addresses');
 
 const ECPair = ECPairFactory(ecc);
 
@@ -182,6 +183,9 @@ module.exports.broadcastRaw = async (req, res, next) => {
     const { txHex } = req.body;
 
     const txid = await broadcast(txHex);
+
+    await updateAllAddrs(req, res, next);
+
     res.send(txid);
   } catch (error) {
     console.log(error);
