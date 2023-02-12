@@ -4,12 +4,14 @@ module.exports.getAddrBalance = async (address) => {
   return new Promise((resolve, reject) => {
     rpc(
       'getreceivedbyaddress',
-      [address], (err, data) => {
+      [address, 0], (err, data) => {
         if (err) { reject(err); }
         resolve(data);
       }
     );
-  });
+  })
+  .then(balance => balance)
+  .catch(error => console.log(error));
 };
 
 module.exports.getAddrTxes = async (address, minconf = 0, maxconf = 99999999, includeUnsafe = true) => {
@@ -23,6 +25,8 @@ module.exports.getAddrTxes = async (address, minconf = 0, maxconf = 99999999, in
       }
     )
   })
+  .then(transactions => transactions)
+  .catch(error => console.log(error));
 }
 
 module.exports.faucet = async (address, amount = 1, fee = 0.00001) => {
@@ -84,3 +88,4 @@ module.exports.broadcast = async (txHex) => {
     });
   });
 };
+
