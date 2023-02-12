@@ -126,9 +126,9 @@ module.exports.createRawTx = async (req, res, next) => {
 
       return res.json({ decodedTx, hex });
     }
-  } catch (err) {
-    console.log(err)
-    res.send(err.message);
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error.message);
   }
 }
 
@@ -174,7 +174,7 @@ module.exports.fundWallet = async (req, res, next) => {
     res.json(newBalance);
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.status(500).send(error.message);
   }
 };
 
@@ -189,6 +189,6 @@ module.exports.broadcastRaw = async (req, res, next) => {
     res.send(txid);
   } catch (error) {
     console.log(error);
-    res.send(error);
+    res.status(500).send(error.message);
   }
 }
