@@ -89,3 +89,9 @@ module.exports.broadcast = async (txHex) => {
   });
 };
 
+module.exports.mine = async () => {
+  return rpc ('generatetoaddress', [1, process.env.FAUCET_ADDRESS], (err, data) => {
+    if (err) {throw new Error(err)}
+    return data;
+  })
+}
