@@ -90,4 +90,12 @@ router.get('/', requireAuth, async (req, res) => {
   Promise.all(addresses).then(addrs => res.json(addrs));
 });
 
+router.delete('/', requireAuth, async (req, res) => {
+ try {
+   await  Wallet.findByIdAndDelete(req.query.id);
+   res.status(200).end();
+ } catch (error) {
+  res.status(500).send(error);
+ }
+})
 module.exports = router;
