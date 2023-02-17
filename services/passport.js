@@ -22,7 +22,7 @@ const localLogin = new LocalStrategy(localOptions, (email, password, done) => {
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.NODE_ENV === 'prodcution' ? 
+  secretOrKey: process.env.NODE_ENV === 'production' ? 
     process.env.PROD_TOKEN_SECRET : 
     'helloworld',
 };
